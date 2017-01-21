@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/bbuck/go-lexer"
+	"github.com/nochso/go-lexer"
 )
 
 const (
@@ -43,7 +43,7 @@ func WhitespaceState(l *lexer.L) lexer.StateFunc {
 	}
 
 	if r != ' ' && r != '\t' && r != '\n' && r != '\r' {
-		l.Error(fmt.Sprintf("unexpected token %q", r))
+		l.Error(fmt.Errorf("unexpected token %q", r))
 		return nil
 	}
 
@@ -178,7 +178,6 @@ func Test_MultipleTokens(t *testing.T) {
 
 func Test_LexerError(t *testing.T) {
 	l := lexer.New("1", WhitespaceState)
-	l.ErrorHandler = func(e string) {}
 	l.Start()
 
 	tok, done := l.NextToken()
