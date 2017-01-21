@@ -1,4 +1,4 @@
-// This package provides a Lexer that functions similarly to Rob Pike's discussion
+// Package lexer provides a Lexer that functions similarly to Rob Pike's discussion
 // about lexer design in this [talk](https://www.youtube.com/watch?v=HxaD_trXwRE).
 //
 // You can define your token types by using the `lexer.TokenType` type (`int`) via
