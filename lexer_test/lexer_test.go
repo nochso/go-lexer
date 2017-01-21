@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/nochso/ctxerr"
 	"github.com/nochso/go-lexer"
 )
 
@@ -196,8 +197,13 @@ func Test_LexerError(t *testing.T) {
 		return
 	}
 
-	if l.Err.Error() != "unexpected token '1'" {
-		t.Errorf("Expected specific message from error, but got %q", l.Err.Error())
+	exp := `unexpected token '1'
+1:1:
+1 | 1
+  | ^
+`
+	if l.Err.Error() != exp {
+		t.Errorf("Expected specific message from error:\n'%v'\n\nbut got:\n\n'%v'", exp, l.Err.Error())
 		return
 	}
 }

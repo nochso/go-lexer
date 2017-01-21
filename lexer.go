@@ -30,6 +30,8 @@ package lexer
 import (
 	"strings"
 	"unicode/utf8"
+
+	"github.com/nochso/ctxerr"
 )
 
 // StateFunc returns the next logical StateFunc or nil on end.
@@ -58,6 +60,7 @@ type L struct {
 	tokens          chan Token
 	ErrorHandler    func(error)
 	rewind          runeStack
+	line, col       int
 }
 
 // New creates a returns a lexer ready to parse the given source code.
@@ -68,6 +71,8 @@ func New(src string, start StateFunc) *L {
 		start:      0,
 		position:   0,
 		rewind:     newRuneStack(),
+		line:       1,
+		col:        1,
 	}
 }
 
@@ -101,6 +106,7 @@ func (l *L) Current() string {
 // Emit will receive a token type and push a new token with the current analyzed
 // value into the tokens channel.
 func (l *L) Emit(t TokenType) {
+	l.line, l.col = trackPos(l.Current(), l.line, l.col)
 	tok := Token{
 		Type:  t,
 		Value: l.Current(),
@@ -108,6 +114,19 @@ func (l *L) Emit(t TokenType) {
 	l.tokens <- tok
 	l.start = l.position
 	l.rewind.clear()
+}
+
+func trackPos(s string, line, col int) (int, int) {
+	newLines := strings.Count(s, "\n")
+	line += newLines
+	if newLines == 0 {
+		col += utf8.RuneCountInString(s)
+	} else {
+		pos := strings.LastIndex(s, "\n")
+		col = 1
+		col += utf8.RuneCountInString(s[pos+1:])
+	}
+	return line, col
 }
 
 // Ignore clears the rewind stack and then sets the current beginning position
@@ -181,7 +200,10 @@ func (l *L) NextToken() (*Token, bool) {
 }
 
 func (l *L) Error(e error) {
-	l.Err = e
+	endLine, endCol := trackPos(l.Current(), l.line, l.col)
+	err := ctxerr.New(l.source, ctxerr.Range(l.line, l.col, endLine, endCol-1))
+	err.Err = e
+	l.Err = err
 	if l.ErrorHandler != nil {
 		l.ErrorHandler(l.Err)
 	}
