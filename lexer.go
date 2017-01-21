@@ -28,7 +28,6 @@
 package lexer
 
 import (
-	"errors"
 	"strings"
 	"unicode/utf8"
 )
@@ -57,7 +56,7 @@ type L struct {
 	startState      StateFunc
 	Err             error
 	tokens          chan Token
-	ErrorHandler    func(e string)
+	ErrorHandler    func(error)
 	rewind          runeStack
 }
 
@@ -181,14 +180,10 @@ func (l *L) NextToken() (*Token, bool) {
 	return nil, true
 }
 
-// Partial yyLexer implementation
-
-func (l *L) Error(e string) {
+func (l *L) Error(e error) {
+	l.Err = e
 	if l.ErrorHandler != nil {
-		l.Err = errors.New(e)
-		l.ErrorHandler(e)
-	} else {
-		panic(e)
+		l.ErrorHandler(l.Err)
 	}
 }
 
