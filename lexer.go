@@ -41,8 +41,7 @@ type TokenType int
 
 const (
 	// EOFRune marks the end of a string.
-	EOFRune    rune      = -1
-	EmptyToken TokenType = 0
+	EOFRune rune = -1
 )
 
 // Token with the type and value as emitted when lexing.
@@ -178,9 +177,8 @@ func (l *L) Take(chars string) {
 func (l *L) NextToken() (*Token, bool) {
 	if tok, ok := <-l.tokens; ok {
 		return &tok, false
-	} else {
-		return nil, true
 	}
+	return nil, true
 }
 
 // Partial yyLexer implementation
