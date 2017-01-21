@@ -33,20 +33,25 @@ import (
 	"unicode/utf8"
 )
 
+// StateFunc returns the next logical StateFunc or nil on end.
 type StateFunc func(*L) StateFunc
 
+// TokenType specifies the type of a token.
 type TokenType int
 
 const (
+	// EOFRune marks the end of a string.
 	EOFRune    rune      = -1
 	EmptyToken TokenType = 0
 )
 
+// Token with the type and value as emitted when lexing.
 type Token struct {
 	Type  TokenType
 	Value string
 }
 
+// L is a generic lexer.
 type L struct {
 	source          string
 	start, position int
@@ -79,6 +84,7 @@ func (l *L) Start() {
 	go l.run()
 }
 
+// StartSync lexes all Tokens synchronously and then returns.
 func (l *L) StartSync() {
 	// Take half the string length as a buffer size.
 	buffSize := len(l.source) / 2
