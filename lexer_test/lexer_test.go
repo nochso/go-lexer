@@ -14,6 +14,10 @@ const (
 	IdentToken
 )
 
+func init() {
+	ctxerr.NoColor = true
+}
+
 func NumberState(l *lexer.L) lexer.StateFunc {
 	l.Take("0123456789")
 	l.Emit(NumberToken)
