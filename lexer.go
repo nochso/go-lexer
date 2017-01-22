@@ -201,7 +201,7 @@ func (l *L) NextToken() (*Token, bool) {
 
 func (l *L) Error(e error) {
 	endLine, endCol := trackPos(l.Current(), l.line, l.col)
-	err := ctxerr.New(l.source, ctxerr.Range(l.line, l.col, endLine, endCol-1))
+	err := ctxerr.New(l.source, ctxerr.Range(l.line, l.col, endLine, endCol))
 	err.Err = e
 	l.Err = err
 	if l.ErrorHandler != nil {
